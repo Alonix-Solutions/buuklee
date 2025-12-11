@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill:*)",
+      "Bash(npx expo start:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(dir /b:*)",
+      "Bash(cat:*)",
+      "Bash(npx expo install:*)",
+      "Bash(dir:*)",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(tasklist:*)",
+      "Bash(node -c:*)",
+      "Bash(find:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -30 {}')",
+      "Bash(node -e:*)",
+      "Bash(watchman watch-del-all:*)",
+      "Bash(node fix-liquid-glass.js:*)",
+      "Bash(node fix-remaining-liquid-glass.js:*)",
+      "Bash(done)",
+      "Bash(grep:*)",
+      "Bash(node fix-divider-colors.js:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

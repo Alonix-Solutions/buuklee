@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Alonix",
+    "slug": "alonix-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#4F46E5"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alonix.mobile",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCr5jmlN6OwUoySOgklEEitfTpCEQZT274"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Alonix needs your location to show nearby activities, track your runs, and find drivers.",
+        "NSLocationAlwaysUsageDescription": "Alonix needs your location to track your workouts and safety status even when the app is in the background.",
+        "NSMotionUsageDescription": "Alonix uses your motion data to track your steps and activity levels."
+      }
+    },
+    "android": {
+      "package": "com.alonix.mobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCr5jmlN6OwUoySOgklEEitfTpCEQZT274"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACTIVITY_RECOGNITION"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Alonix to use your location."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow Alonix to access your motion sensors for fitness tracking."
+        }
+      ]
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
