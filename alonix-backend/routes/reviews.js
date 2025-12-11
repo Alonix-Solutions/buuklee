@@ -7,9 +7,61 @@ const { authenticate: auth } = require('../middleware/auth');
 let reviews = [];
 
 /**
- * @route   GET /api/reviews
- * @desc    Get all reviews
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: Reviews
+ *   description: Reviews and ratings
+ */
+
+/**
+ * @swagger
+ * /api/reviews:
+ *   get:
+ *     summary: Get all reviews
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: query
+ *         name: entityType
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: entityId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of reviews
+ *   post:
+ *     summary: Create a review
+ *     tags: [Reviews]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - entityType
+ *               - entityId
+ *               - rating
+ *             properties:
+ *               entityType:
+ *                 type: string
+ *               entityId:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *                 minimum: 1
+ *                 maximum: 5
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review created
  */
 router.get('/', async (req, res) => {
     try {
@@ -44,9 +96,25 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/reviews/:type/:id
- * @desc    Get reviews for a specific entity
- * @access  Public
+ * @swagger
+ * /api/reviews/{type}/{id}:
+ *   get:
+ *     summary: Get reviews for entity
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Entity reviews
  */
 router.get('/:type/:id', async (req, res) => {
     try {

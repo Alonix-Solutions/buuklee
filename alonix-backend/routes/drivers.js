@@ -5,9 +5,30 @@ const Driver = require('../models/Driver');
 const { authenticate: auth } = require('../middleware/auth');
 
 /**
- * @route   GET /api/drivers
- * @desc    Get all drivers with optional filters
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: Drivers
+ *   description: Driver management and availability
+ */
+
+/**
+ * @swagger
+ * /api/drivers:
+ *   get:
+ *     summary: Get all drivers
+ *     tags: [Drivers]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: available
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: List of drivers
  */
 router.get('/', async (req, res) => {
     try {
@@ -76,9 +97,14 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/drivers/available
- * @desc    Get available drivers
- * @access  Public
+ * @swagger
+ * /api/drivers/available:
+ *   get:
+ *     summary: Get available drivers
+ *     tags: [Drivers]
+ *     responses:
+ *       200:
+ *         description: List of available drivers
  */
 router.get('/available', async (req, res) => {
     try {
@@ -98,9 +124,20 @@ router.get('/available', async (req, res) => {
 });
 
 /**
- * @route   GET /api/drivers/:id
- * @desc    Get driver by ID
- * @access  Public
+ * @swagger
+ * /api/drivers/{id}:
+ *   get:
+ *     summary: Get driver by ID
+ *     tags: [Drivers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Driver details
  */
 router.get('/:id', async (req, res) => {
     try {
@@ -126,9 +163,37 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   POST /api/drivers/:id/rate
- * @desc    Rate a driver
- * @access  Private
+ * @swagger
+ * /api/drivers/{id}/rate:
+ *   post:
+ *     summary: Rate a driver
+ *     tags: [Drivers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *             properties:
+ *               rating:
+ *                 type: number
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Rating submitted
  */
 router.post('/:id/rate', auth, async (req, res) => {
     try {

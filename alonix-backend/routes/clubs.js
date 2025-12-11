@@ -8,9 +8,38 @@ const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 
 /**
- * @route   POST /api/clubs
- * @desc    Create a new club (optionally from completed activity)
- * @access  Private
+ * @swagger
+ * tags:
+ *   name: Clubs
+ *   description: Club management and events
+ */
+
+/**
+ * @swagger
+ * /api/clubs:
+ *   post:
+ *     summary: Create a new club
+ *     tags: [Clubs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               createdFromActivity:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Club created
  */
 router.post('/', authenticate, [
   body('name').trim().isLength({ min: 3, max: 100 }).withMessage('Club name must be 3-100 characters'),
@@ -118,9 +147,23 @@ router.post('/', authenticate, [
 });
 
 /**
- * @route   GET /api/clubs
- * @desc    Get all clubs (public or user's clubs)
- * @access  Public
+ * @swagger
+ * /api/clubs:
+ *   get:
+ *     summary: Get all clubs
+ *     tags: [Clubs]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of clubs
  */
 router.get('/', [
   query('page').optional().isInt({ min: 1 }),
@@ -200,9 +243,20 @@ router.get('/', [
 });
 
 /**
- * @route   GET /api/clubs/:id
- * @desc    Get club by ID
- * @access  Public (if public) or Private (if member)
+ * @swagger
+ * /api/clubs/{id}:
+ *   get:
+ *     summary: Get club by ID
+ *     tags: [Clubs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Club details
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -286,9 +340,22 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   POST /api/clubs/:id/join
- * @desc    Join a club
- * @access  Private
+ * @swagger
+ * /api/clubs/{id}/join:
+ *   post:
+ *     summary: Join a club
+ *     tags: [Clubs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully joined
  */
 router.post('/:id/join', authenticate, async (req, res) => {
   try {
@@ -326,9 +393,22 @@ router.post('/:id/join', authenticate, async (req, res) => {
 });
 
 /**
- * @route   POST /api/clubs/:id/leave
- * @desc    Leave a club
- * @access  Private
+ * @swagger
+ * /api/clubs/{id}/leave:
+ *   post:
+ *     summary: Leave a club
+ *     tags: [Clubs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully left
  */
 router.post('/:id/leave', authenticate, async (req, res) => {
   try {
@@ -364,9 +444,56 @@ router.post('/:id/leave', authenticate, async (req, res) => {
 });
 
 /**
- * @route   POST /api/clubs/:id/events
- * @desc    Create a club event
- * @access  Private (Members only)
+ * @swagger
+ * /api/clubs/{id}/events:
+ *   post:
+ *     summary: Create a club event
+ *     tags: [Clubs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - date
+ *               - location
+ *             properties:
+ *               title:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               location:
+ *                 type: object
+ *     responses:
+ *       201:
+ *         description: Event created
+ *   get:
+ *     summary: Get club events
+ *     tags: [Clubs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of events
  */
 router.post('/:id/events', authenticate, [
   body('title').trim().isLength({ min: 3, max: 200 }).withMessage('Title must be 3-200 characters'),
@@ -512,9 +639,39 @@ router.get('/:id/events', [
 });
 
 /**
- * @route   POST /api/clubs/:id/events/:eventId/confirm
- * @desc    Confirm availability for a club event
- * @access  Private (Members only)
+ * @swagger
+ * /api/clubs/{id}/events/{eventId}/confirm:
+ *   post:
+ *     summary: Confirm availability for event
+ *     tags: [Clubs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [confirmed, maybe, declined]
+ *     responses:
+ *       200:
+ *         description: Availability confirmed
  */
 router.post('/:id/events/:eventId/confirm', authenticate, [
   body('status').isIn(['confirmed', 'maybe', 'declined']).withMessage('Invalid status')

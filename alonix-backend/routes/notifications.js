@@ -10,9 +10,32 @@ const { Expo } = require('expo-server-sdk');
 const expo = new Expo();
 
 /**
- * @route   GET /api/notifications
- * @desc    Get user's notifications
- * @access  Private
+ * @swagger
+ * tags:
+ *   name: Notifications
+ *   description: User notifications and push notifications
+ */
+
+/**
+ * @swagger
+ * /api/notifications:
+ *   get:
+ *     summary: Get user notifications
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: read
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: List of notifications
  */
 router.get('/', authenticate, [
   query('page').optional().isInt({ min: 1 }),
@@ -77,9 +100,22 @@ router.get('/', authenticate, [
 });
 
 /**
- * @route   PUT /api/notifications/:id/read
- * @desc    Mark notification as read
- * @access  Private
+ * @swagger
+ * /api/notifications/{id}/read:
+ *   put:
+ *     summary: Mark notification as read
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Notification marked as read
  */
 router.put('/:id/read', authenticate, async (req, res) => {
   try {
@@ -117,19 +153,26 @@ router.put('/:id/read', authenticate, async (req, res) => {
 });
 
 /**
- * @route   PUT /api/notifications/read-all
- * @desc    Mark all notifications as read
- * @access  Private
+ * @swagger
+ * /api/notifications/read-all:
+ *   put:
+ *     summary: Mark all notifications as read
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All notifications marked as read
  */
 router.put('/read-all', authenticate, async (req, res) => {
   try {
     await Notification.updateMany(
       { userId: req.userId, read: false },
-      { 
-        $set: { 
-          read: true, 
-          readAt: new Date() 
-        } 
+      {
+        $set: {
+          read: true,
+          readAt: new Date()
+        }
       }
     );
 
@@ -147,9 +190,22 @@ router.put('/read-all', authenticate, async (req, res) => {
 });
 
 /**
- * @route   DELETE /api/notifications/:id
- * @desc    Delete a notification
- * @access  Private
+ * @swagger
+ * /api/notifications/{id}:
+ *   delete:
+ *     summary: Delete a notification
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Notification deleted
  */
 router.delete('/:id', authenticate, async (req, res) => {
   try {
@@ -186,9 +242,16 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 /**
- * @route   GET /api/notifications/unread-count
- * @desc    Get unread notification count
- * @access  Private
+ * @swagger
+ * /api/notifications/unread-count:
+ *   get:
+ *     summary: Get unread notification count
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Unread count
  */
 router.get('/unread-count', authenticate, async (req, res) => {
   try {
@@ -216,7 +279,7 @@ router.get('/unread-count', authenticate, async (req, res) => {
 async function sendPushNotification(userId, notification) {
   try {
     const user = await User.findById(userId);
-    
+
     if (!user || !user.pushToken) {
       return { success: false, error: 'User has no push token' };
     }

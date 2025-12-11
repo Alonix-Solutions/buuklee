@@ -6,9 +6,39 @@ const Booking = require('../models/Booking');
 const { authenticate } = require('../middleware/auth');
 
 /**
- * @route   POST /api/payments/create-intent
- * @desc    Create Stripe payment intent
- * @access  Private
+ * @swagger
+ * tags:
+ *   name: Payments
+ *   description: Stripe payment processing
+ */
+
+/**
+ * @swagger
+ * /api/payments/create-intent:
+ *   post:
+ *     summary: Create Stripe payment intent
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - bookingId
+ *               - amount
+ *             properties:
+ *               bookingId:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               currency:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Payment intent created
  */
 router.post('/create-intent', authenticate, [
   body('bookingId').isMongoId().withMessage('Valid booking ID required'),
@@ -87,9 +117,30 @@ router.post('/create-intent', authenticate, [
 });
 
 /**
- * @route   POST /api/payments/confirm
- * @desc    Confirm payment and update booking
- * @access  Private
+ * @swagger
+ * /api/payments/confirm:
+ *   post:
+ *     summary: Confirm payment
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - paymentIntentId
+ *               - bookingId
+ *             properties:
+ *               paymentIntentId:
+ *                 type: string
+ *               bookingId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Payment confirmed
  */
 router.post('/confirm', authenticate, [
   body('paymentIntentId').notEmpty().withMessage('Payment intent ID required'),
@@ -186,7 +237,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   switch (event.type) {
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object;
-      
+
       // Find booking by payment intent ID
       const booking = await Booking.findOne({
         'payment.paymentIntentId': paymentIntent.id
@@ -205,7 +256,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
     case 'payment_intent.payment_failed':
       const failedPayment = event.data.object;
-      
+
       const failedBooking = await Booking.findOne({
         'payment.paymentIntentId': failedPayment.id
       });
@@ -227,9 +278,29 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 });
 
 /**
- * @route   POST /api/payments/refund
- * @desc    Process refund for a booking
- * @access  Private
+ * @swagger
+ * /api/payments/refund:
+ *   post:
+ *     summary: Process refund
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - bookingId
+ *             properties:
+ *               bookingId:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Refund processed
  */
 router.post('/refund', authenticate, [
   body('bookingId').isMongoId().withMessage('Valid booking ID required'),

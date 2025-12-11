@@ -11,9 +11,47 @@ const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 
 /**
- * @route   POST /api/bookings/hotels
- * @desc    Book a hotel
- * @access  Private
+ * @swagger
+ * tags:
+ *   name: Bookings
+ *   description: Hotel, restaurant, taxi, and vehicle bookings
+ */
+
+/**
+ * @swagger
+ * /api/bookings/hotels:
+ *   post:
+ *     summary: Book a hotel
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - hotelId
+ *               - checkIn
+ *               - checkOut
+ *               - guests
+ *             properties:
+ *               hotelId:
+ *                 type: string
+ *               checkIn:
+ *                 type: string
+ *                 format: date-time
+ *               checkOut:
+ *                 type: string
+ *                 format: date-time
+ *               guests:
+ *                 type: integer
+ *               roomType:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Hotel booking created
  */
 router.post('/hotels', authenticate, [
   body('hotelId').isMongoId().withMessage('Valid hotel ID required'),
@@ -96,9 +134,37 @@ router.post('/hotels', authenticate, [
 });
 
 /**
- * @route   POST /api/bookings/restaurants
- * @desc    Book a restaurant reservation
- * @access  Private
+ * @swagger
+ * /api/bookings/restaurants:
+ *   post:
+ *     summary: Book a restaurant reservation
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - restaurantId
+ *               - reservationDate
+ *               - reservationTime
+ *               - partySize
+ *             properties:
+ *               restaurantId:
+ *                 type: string
+ *               reservationDate:
+ *                 type: string
+ *                 format: date-time
+ *               reservationTime:
+ *                 type: string
+ *               partySize:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Reservation created
  */
 router.post('/restaurants', authenticate, [
   body('restaurantId').isMongoId().withMessage('Valid restaurant ID required'),
@@ -183,9 +249,36 @@ router.post('/restaurants', authenticate, [
 });
 
 /**
- * @route   POST /api/bookings/taxis
- * @desc    Book a taxi/driver
- * @access  Private
+ * @swagger
+ * /api/bookings/taxis:
+ *   post:
+ *     summary: Book a taxi/driver
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - pickupLocation
+ *               - dropoffLocation
+ *               - pickupTime
+ *             properties:
+ *               driverId:
+ *                 type: string
+ *               pickupLocation:
+ *                 type: object
+ *               dropoffLocation:
+ *                 type: object
+ *               pickupTime:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Taxi booked
  */
 router.post('/taxis', authenticate, [
   body('driverId').optional().isMongoId(),
@@ -205,7 +298,7 @@ router.post('/taxis', authenticate, [
     const { driverId, pickupLocation, dropoffLocation, pickupTime, estimatedDistance, estimatedDuration } = req.body;
 
     let driver;
-    
+
     // If driverId provided, use that driver
     if (driverId) {
       driver = await Driver.findById(driverId).populate('userId', 'name phone');
@@ -245,7 +338,7 @@ router.post('/taxis', authenticate, [
     // Calculate price
     const distanceKm = estimatedDistance ? estimatedDistance / 1000 : 5; // Default 5km if not provided
     const durationHours = estimatedDuration ? estimatedDuration / 60 : 0.5; // Default 30min
-    
+
     const baseRate = driver.pricing.baseRate || 0;
     const distanceCost = (driver.pricing.perKm || 0) * distanceKm;
     const timeCost = (driver.pricing.perHour || 0) * durationHours;
@@ -312,9 +405,39 @@ router.post('/taxis', authenticate, [
 });
 
 /**
- * @route   POST /api/bookings/vehicles
- * @desc    Book a vehicle rental
- * @access  Private
+ * @swagger
+ * /api/bookings/vehicles:
+ *   post:
+ *     summary: Book a vehicle rental
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - vehicleId
+ *               - rentalStart
+ *               - rentalEnd
+ *               - rentalPeriod
+ *             properties:
+ *               vehicleId:
+ *                 type: string
+ *               rentalStart:
+ *                 type: string
+ *                 format: date-time
+ *               rentalEnd:
+ *                 type: string
+ *                 format: date-time
+ *               rentalPeriod:
+ *                 type: string
+ *                 enum: [hourly, daily, weekly, monthly]
+ *     responses:
+ *       201:
+ *         description: Vehicle booked
  */
 router.post('/vehicles', authenticate, [
   body('vehicleId').isMongoId().withMessage('Valid vehicle ID required'),
@@ -344,7 +467,7 @@ router.post('/vehicles', authenticate, [
     // Check availability dates
     const start = new Date(rentalStart);
     const end = new Date(rentalEnd);
-    
+
     if (vehicle.availability.availableFrom && start < vehicle.availability.availableFrom) {
       return res.status(400).json({
         success: false,
@@ -436,9 +559,29 @@ router.post('/vehicles', authenticate, [
 });
 
 /**
- * @route   GET /api/bookings/nearby-taxis
- * @desc    Find nearby available taxis/drivers
- * @access  Public
+ * @swagger
+ * /api/bookings/nearby-taxis:
+ *   get:
+ *     summary: Find nearby available taxis
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: query
+ *         name: longitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: latitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of nearby taxis
  */
 router.get('/nearby-taxis', [
   query('longitude').isFloat().withMessage('Valid longitude required'),
@@ -491,9 +634,27 @@ router.get('/nearby-taxis', [
 });
 
 /**
- * @route   GET /api/bookings/available-vehicles
- * @desc    Get available vehicles for rental
- * @access  Public
+ * @swagger
+ * /api/bookings/available-vehicles:
+ *   get:
+ *     summary: Get available vehicles for rental
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: longitude
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: latitude
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: List of available vehicles
  */
 router.get('/available-vehicles', [
   query('type').optional().isIn(['bike', 'car', 'scooter', 'motorcycle', 'other']),
@@ -548,9 +709,22 @@ router.get('/available-vehicles', [
 });
 
 /**
- * @route   GET /api/bookings/:id
- * @desc    Get booking by ID
- * @access  Private
+ * @swagger
+ * /api/bookings/{id}:
+ *   get:
+ *     summary: Get booking by ID
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Booking details
  */
 router.get('/:id', authenticate, async (req, res) => {
   try {
@@ -587,9 +761,22 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 /**
- * @route   GET /api/bookings/user/:userId
- * @desc    Get user's bookings
- * @access  Private
+ * @swagger
+ * /api/bookings/user/{userId}:
+ *   get:
+ *     summary: Get user's bookings
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User bookings list
  */
 router.get('/user/:userId', authenticate, async (req, res) => {
   try {
@@ -633,9 +820,30 @@ router.get('/user/:userId', authenticate, async (req, res) => {
 });
 
 /**
- * @route   POST /api/bookings/:id/cancel
- * @desc    Cancel a booking
- * @access  Private
+ * @swagger
+ * /api/bookings/{id}/cancel:
+ *   post:
+ *     summary: Cancel a booking
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Booking cancelled
  */
 router.post('/:id/cancel', authenticate, [
   body('reason').optional().trim()

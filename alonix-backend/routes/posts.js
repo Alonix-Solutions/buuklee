@@ -6,9 +6,51 @@ const User = require('../models/User');
 const { authenticate: auth } = require('../middleware/auth');
 
 /**
- * @route   GET /api/posts
- * @desc    Get all posts with optional filters
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: Posts
+ *   description: Social posts and feed
+ */
+
+/**
+ * @swagger
+ * /api/posts:
+ *   get:
+ *     summary: Get all posts
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of posts
+ *   post:
+ *     summary: Create a new post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Post created
  */
 router.get('/', async (req, res) => {
     try {
@@ -48,9 +90,16 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/posts/feed
- * @desc    Get personalized feed for authenticated user
- * @access  Private
+ * @swagger
+ * /api/posts/feed:
+ *   get:
+ *     summary: Get personalized feed
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Personalized feed
  */
 router.get('/feed', auth, async (req, res) => {
     try {
@@ -110,9 +159,34 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 /**
- * @route   GET /api/posts/:id
- * @desc    Get a single post by ID
- * @access  Public
+ * @swagger
+ * /api/posts/{id}:
+ *   get:
+ *     summary: Get post by ID
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post details
+ *   delete:
+ *     summary: Delete a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post deleted
  */
 router.get('/:id', async (req, res) => {
     try {
@@ -180,9 +254,22 @@ router.post('/', auth, async (req, res) => {
 });
 
 /**
- * @route   POST /api/posts/:id/like
- * @desc    Like/unlike a post
- * @access  Private
+ * @swagger
+ * /api/posts/{id}/like:
+ *   post:
+ *     summary: Like/unlike a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Like toggled
  */
 router.post('/:id/like', auth, async (req, res) => {
     try {
@@ -212,9 +299,45 @@ router.post('/:id/like', auth, async (req, res) => {
 });
 
 /**
- * @route   GET /api/posts/:id/comments
- * @desc    Get comments for a post
- * @access  Public
+ * @swagger
+ * /api/posts/{id}/comments:
+ *   get:
+ *     summary: Get comments for a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of comments
+ *   post:
+ *     summary: Add a comment
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Comment added
  */
 router.get('/:id/comments', async (req, res) => {
     try {

@@ -5,9 +5,34 @@ const Vehicle = require('../models/Vehicle');
 const { authenticate: auth } = require('../middleware/auth');
 
 /**
- * @route   GET /api/vehicles
- * @desc    Get all vehicles with optional filters
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: Vehicles
+ *   description: Vehicle rentals and availability
+ */
+
+/**
+ * @swagger
+ * /api/vehicles:
+ *   get:
+ *     summary: Get all vehicles
+ *     tags: [Vehicles]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: available
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: List of vehicles
  */
 router.get('/', async (req, res) => {
     try {
@@ -86,9 +111,14 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/vehicles/available
- * @desc    Get available vehicles
- * @access  Public
+ * @swagger
+ * /api/vehicles/available:
+ *   get:
+ *     summary: Get available vehicles
+ *     tags: [Vehicles]
+ *     responses:
+ *       200:
+ *         description: List of available vehicles
  */
 router.get('/available', async (req, res) => {
     try {
@@ -108,9 +138,20 @@ router.get('/available', async (req, res) => {
 });
 
 /**
- * @route   GET /api/vehicles/:id
- * @desc    Get vehicle by ID
- * @access  Public
+ * @swagger
+ * /api/vehicles/{id}:
+ *   get:
+ *     summary: Get vehicle by ID
+ *     tags: [Vehicles]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Vehicle details
  */
 router.get('/:id', async (req, res) => {
     try {
@@ -136,9 +177,35 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   POST /api/vehicles/:id/book
- * @desc    Book a vehicle
- * @access  Private
+ * @swagger
+ * /api/vehicles/{id}/book:
+ *   post:
+ *     summary: Book a vehicle
+ *     tags: [Vehicles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: Vehicle booked
  */
 router.post('/:id/book', auth, async (req, res) => {
     try {

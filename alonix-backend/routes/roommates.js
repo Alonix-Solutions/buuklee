@@ -5,9 +5,42 @@ const RoommateRequest = require('../models/RoommateRequest');
 const { authenticate } = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 
-// @route   POST /api/roommates
-// @desc    Create a roommate request
-// @access  Private
+/**
+ * @swagger
+ * tags:
+ *   name: Roommates
+ *   description: Roommate finding for activities
+ */
+
+/**
+ * @swagger
+ * /api/roommates:
+ *   post:
+ *     summary: Create roommate request
+ *     tags: [Roommates]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activityId
+ *             properties:
+ *               activityId:
+ *                 type: string
+ *               accommodation:
+ *                 type: object
+ *               preferences:
+ *                 type: object
+ *               budget:
+ *                 type: object
+ *     responses:
+ *       201:
+ *         description: Roommate request created
+ */
 router.post('/', authenticate, [
     check('activityId', 'Activity ID is required').not().isEmpty(),
 ], async (req, res) => {
@@ -49,9 +82,22 @@ router.post('/', authenticate, [
     }
 });
 
-// @route   GET /api/roommates/:activityId
-// @desc    Get all roommate requests for an activity
-// @access  Public
+/**
+ * @swagger
+ * /api/roommates/{activityId}:
+ *   get:
+ *     summary: Get roommate requests for activity
+ *     tags: [Roommates]
+ *     parameters:
+ *       - in: path
+ *         name: activityId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of roommate requests
+ */
 router.get('/:activityId', async (req, res) => {
     try {
         const requests = await RoommateRequest.find({

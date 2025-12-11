@@ -2,9 +2,23 @@ const express = require('express');
 const router = express.Router();
 const Restaurant = require('../models/Restaurant');
 
-// @route   GET /api/restaurants
-// @desc    Get all restaurants
-// @access  Public
+/**
+ * @swagger
+ * tags:
+ *   name: Restaurants
+ *   description: Restaurant listings
+ */
+
+/**
+ * @swagger
+ * /api/restaurants:
+ *   get:
+ *     summary: Get all restaurants
+ *     tags: [Restaurants]
+ *     responses:
+ *       200:
+ *         description: List of restaurants
+ */
 router.get('/', async (req, res) => {
     try {
         const restaurants = await Restaurant.find().sort({ rating: -1 });
@@ -15,9 +29,22 @@ router.get('/', async (req, res) => {
     }
 });
 
-// @route   GET /api/restaurants/:id
-// @desc    Get single restaurant
-// @access  Public
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   get:
+ *     summary: Get restaurant by ID
+ *     tags: [Restaurants]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Restaurant details
+ */
 router.get('/:id', async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id);

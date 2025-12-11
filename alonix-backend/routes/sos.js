@@ -7,9 +7,39 @@ const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 
 /**
- * @route   POST /api/sos/alert
- * @desc    Trigger SOS emergency alert
- * @access  Private
+ * @swagger
+ * tags:
+ *   name: SOS
+ *   description: Emergency SOS alerts and responses
+ */
+
+/**
+ * @swagger
+ * /api/sos/alert:
+ *   post:
+ *     summary: Trigger SOS emergency alert
+ *     tags: [SOS]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activityId
+ *               - location
+ *             properties:
+ *               activityId:
+ *                 type: string
+ *               location:
+ *                 type: object
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: SOS alert sent
  */
 router.post('/alert', authenticate, [
   body('activityId').notEmpty().withMessage('Activity ID is required'),
@@ -108,9 +138,16 @@ router.post('/alert', authenticate, [
 });
 
 /**
- * @route   GET /api/sos/active
- * @desc    Get active SOS alerts for activities user is in
- * @access  Private
+ * @swagger
+ * /api/sos/active:
+ *   get:
+ *     summary: Get active SOS alerts
+ *     tags: [SOS]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of active alerts
  */
 router.get('/active', authenticate, async (req, res) => {
   try {
@@ -148,9 +185,36 @@ router.get('/active', authenticate, async (req, res) => {
 });
 
 /**
- * @route   POST /api/sos/:id/respond
- * @desc    Respond to SOS alert
- * @access  Private
+ * @swagger
+ * /api/sos/{id}/respond:
+ *   post:
+ *     summary: Respond to SOS alert
+ *     tags: [SOS]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - response
+ *             properties:
+ *               response:
+ *                 type: string
+ *                 enum: [on_way, contacted, handled]
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Response recorded
  */
 router.post('/:id/respond', authenticate, [
   body('response').isIn(['on_way', 'contacted', 'handled']).withMessage('Invalid response type'),
@@ -211,9 +275,22 @@ router.post('/:id/respond', authenticate, [
 });
 
 /**
- * @route   POST /api/sos/:id/resolve
- * @desc    Mark SOS alert as resolved
- * @access  Private
+ * @swagger
+ * /api/sos/{id}/resolve:
+ *   post:
+ *     summary: Mark SOS alert as resolved
+ *     tags: [SOS]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Alert resolved
  */
 router.post('/:id/resolve', authenticate, [
   body('notes').optional().trim()
@@ -238,7 +315,7 @@ router.post('/:id/resolve', authenticate, [
     // Only the person who triggered the alert or activity organizer can resolve
     const activity = await Activity.findById(alert.activityId);
     const canResolve = alert.userId.toString() === req.userId.toString() ||
-                       activity.organizerId.toString() === req.userId.toString();
+      activity.organizerId.toString() === req.userId.toString();
 
     if (!canResolve) {
       return res.status(403).json({
@@ -273,9 +350,22 @@ router.post('/:id/resolve', authenticate, [
 });
 
 /**
- * @route   GET /api/sos/activity/:activityId
- * @desc    Get all SOS alerts for an activity
- * @access  Private
+ * @swagger
+ * /api/sos/activity/{activityId}:
+ *   get:
+ *     summary: Get all SOS alerts for an activity
+ *     tags: [SOS]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: activityId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of alerts
  */
 router.get('/activity/:activityId', authenticate, async (req, res) => {
   try {
@@ -292,7 +382,7 @@ router.get('/activity/:activityId', authenticate, async (req, res) => {
     }
 
     const isParticipant = activity.isParticipant(req.userId) ||
-                         activity.organizerId.toString() === req.userId.toString();
+      activity.organizerId.toString() === req.userId.toString();
 
     if (!isParticipant) {
       return res.status(403).json({

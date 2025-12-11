@@ -2,9 +2,23 @@ const express = require('express');
 const router = express.Router();
 const Hotel = require('../models/Hotel');
 
-// @route   GET /api/hotels
-// @desc    Get all hotels
-// @access  Public
+/**
+ * @swagger
+ * tags:
+ *   name: Hotels
+ *   description: Hotel listings and search
+ */
+
+/**
+ * @swagger
+ * /api/hotels:
+ *   get:
+ *     summary: Get all hotels
+ *     tags: [Hotels]
+ *     responses:
+ *       200:
+ *         description: List of hotels
+ */
 router.get('/', async (req, res) => {
     try {
         const hotels = await Hotel.find().sort({ rating: -1 });
@@ -15,9 +29,33 @@ router.get('/', async (req, res) => {
     }
 });
 
-// @route   GET /api/hotels/near
-// @desc    Find hotels inside a bounding box or near a center point
-// @access  Public
+/**
+ * @swagger
+ * /api/hotels/near:
+ *   get:
+ *     summary: Find hotels near a location
+ *     tags: [Hotels]
+ *     parameters:
+ *       - in: query
+ *         name: neLat
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: neLng
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: swLat
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: swLng
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Nearby hotels
+ */
 router.get('/near', async (req, res) => {
     try {
         const { neLat, neLng, swLat, swLng, centerLat, centerLng, radius = 5000, limit = 100 } = req.query;
@@ -40,7 +78,7 @@ router.get('/near', async (req, res) => {
 
             filter.location = {
                 $geoWithin: {
-                    $box: [ [minLng, minLat], [maxLng, maxLat] ]
+                    $box: [[minLng, minLat], [maxLng, maxLat]]
                 }
             };
         } else if (centerLat && centerLng) {
@@ -78,9 +116,37 @@ router.get('/near', async (req, res) => {
     }
 });
 
-// @route   GET /api/hotels/cluster
-// @desc    Return clustered hotels for a viewport (simple grid clustering)
-// @access  Public
+/**
+ * @swagger
+ * /api/hotels/cluster:
+ *   get:
+ *     summary: Get clustered hotels for map
+ *     tags: [Hotels]
+ *     parameters:
+ *       - in: query
+ *         name: neLat
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: neLng
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: swLat
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: swLng
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: zoom
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Clustered hotels
+ */
 router.get('/cluster', async (req, res) => {
     try {
         const { neLat, neLng, swLat, swLng, zoom = 10, limit = 100 } = req.query;
@@ -112,7 +178,7 @@ router.get('/cluster', async (req, res) => {
         const docs = await Hotel.find({
             location: {
                 $geoWithin: {
-                    $box: [ [minLng, minLat], [maxLng, maxLat] ]
+                    $box: [[minLng, minLat], [maxLng, maxLat]]
                 }
             }
         }, projection).lean().limit(Math.min(1000, parseInt(limit, 10) || 1000));
@@ -162,9 +228,22 @@ router.get('/cluster', async (req, res) => {
     }
 });
 
-// @route   GET /api/hotels/:id
-// @desc    Get single hotel
-// @access  Public
+/**
+ * @swagger
+ * /api/hotels/{id}:
+ *   get:
+ *     summary: Get hotel by ID
+ *     tags: [Hotels]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Hotel details
+ */
 router.get('/:id', async (req, res) => {
     try {
         const hotel = await Hotel.findById(req.params.id);

@@ -6,9 +6,27 @@ const Restaurant = require('../models/Restaurant');
 const { generateWhatsAppLink, generateBookingMessage, generateInquiryMessage } = require('../utils/whatsapp');
 
 /**
- * @route   GET /api/whatsapp/hotel/:hotelId
- * @desc    Get WhatsApp link for hotel
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: WhatsApp
+ *   description: WhatsApp integration links
+ */
+
+/**
+ * @swagger
+ * /api/whatsapp/hotel/{hotelId}:
+ *   get:
+ *     summary: Get WhatsApp link for hotel
+ *     tags: [WhatsApp]
+ *     parameters:
+ *       - in: path
+ *         name: hotelId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: WhatsApp link generated
  */
 router.get('/hotel/:hotelId', async (req, res) => {
   try {
@@ -22,7 +40,7 @@ router.get('/hotel/:hotelId', async (req, res) => {
     }
 
     const { inquiryType = 'general', bookingData } = req.query;
-    
+
     let message = '';
     if (bookingData) {
       try {
@@ -56,9 +74,20 @@ router.get('/hotel/:hotelId', async (req, res) => {
 });
 
 /**
- * @route   GET /api/whatsapp/restaurant/:restaurantId
- * @desc    Get WhatsApp link for restaurant
- * @access  Public
+ * @swagger
+ * /api/whatsapp/restaurant/{restaurantId}:
+ *   get:
+ *     summary: Get WhatsApp link for restaurant
+ *     tags: [WhatsApp]
+ *     parameters:
+ *       - in: path
+ *         name: restaurantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: WhatsApp link generated
  */
 router.get('/restaurant/:restaurantId', async (req, res) => {
   try {
@@ -72,7 +101,7 @@ router.get('/restaurant/:restaurantId', async (req, res) => {
     }
 
     const { inquiryType = 'general', bookingData } = req.query;
-    
+
     let message = '';
     if (bookingData) {
       try {
@@ -106,9 +135,27 @@ router.get('/restaurant/:restaurantId', async (req, res) => {
 });
 
 /**
- * @route   POST /api/whatsapp/generate-link
- * @desc    Generate WhatsApp link with custom message
- * @access  Public
+ * @swagger
+ * /api/whatsapp/generate-link:
+ *   post:
+ *     summary: Generate custom WhatsApp link
+ *     tags: [WhatsApp]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phoneNumber
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *               message:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: WhatsApp link generated
  */
 router.post('/generate-link', [
   body('phoneNumber').notEmpty().withMessage('Phone number required'),

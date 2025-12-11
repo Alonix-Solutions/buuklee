@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const path = require('path');
 
 const options = {
     definition: {
@@ -17,7 +18,6 @@ const options = {
                 url: 'http://localhost:3000',
                 description: 'Local Development Server',
             },
-            // You can add production servers here later
         ],
         components: {
             securitySchemes: {
@@ -27,6 +27,35 @@ const options = {
                     bearerFormat: 'JWT',
                 },
             },
+            schemas: {
+                User: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        name: { type: 'string' },
+                        email: { type: 'string' },
+                        profilePhoto: { type: 'string' },
+                    },
+                },
+                Activity: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        title: { type: 'string' },
+                        activityType: { type: 'string' },
+                        date: { type: 'string', format: 'date-time' },
+                        status: { type: 'string' },
+                    },
+                },
+                Booking: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        type: { type: 'string' },
+                        status: { type: 'string' },
+                    },
+                },
+            },
         },
         security: [
             {
@@ -34,8 +63,11 @@ const options = {
             },
         ],
     },
-    // Paths to files containing OpenAPI definitions
-    apis: ['./server.js', './routes/*.js'],
+    // Paths to files containing OpenAPI definitions - use absolute paths
+    apis: [
+        path.join(__dirname, '../server.js'),
+        path.join(__dirname, '../routes/*.js')
+    ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

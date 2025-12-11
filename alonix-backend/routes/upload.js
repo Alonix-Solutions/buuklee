@@ -3,10 +3,24 @@ const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 
 /**
- * Placeholder routes for file uploads
- * TODO: Implement Cloudinary integration
+ * @swagger
+ * tags:
+ *   name: Upload
+ *   description: File upload endpoints (placeholder)
  */
 
+/**
+ * @swagger
+ * /api/upload/profile-photo:
+ *   post:
+ *     summary: Upload profile photo (Coming soon)
+ *     tags: [Upload]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       501:
+ *         description: Not implemented yet
+ */
 router.post('/profile-photo', authenticate, async (req, res) => {
   res.status(501).json({
     success: false,
@@ -14,6 +28,18 @@ router.post('/profile-photo', authenticate, async (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /api/upload/activity-photo:
+ *   post:
+ *     summary: Upload activity photo (Coming soon)
+ *     tags: [Upload]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       501:
+ *         description: Not implemented yet
+ */
 router.post('/activity-photo', authenticate, async (req, res) => {
   res.status(501).json({
     success: false,
