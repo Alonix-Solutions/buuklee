@@ -15,8 +15,12 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
-                description: 'Local Development Server',
+                url: process.env.NODE_ENV === 'production'
+                    ? (process.env.AZURE_WEBAPP_URL || 'https://alonix-backend.azurewebsites.net')
+                    : 'http://localhost:3000',
+                description: process.env.NODE_ENV === 'production'
+                    ? 'Production Server'
+                    : 'Local Development Server',
             },
         ],
         components: {

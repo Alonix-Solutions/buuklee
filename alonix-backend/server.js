@@ -146,7 +146,7 @@ app.use((req, res) => {
 // Database connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://pascalgihozo:Ailey@123@alonix-cluster.nc856v9.mongodb.net/alonix?retryWrites=true&w=majority';
+    const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://pascalgihozo:Ailey%40123@alonix-cluster.nc856v9.mongodb.net/alonix?retryWrites=true&w=majority';
     await mongoose.connect(mongoURI);
     console.log('✅ MongoDB connected successfully');
   } catch (error) {

@@ -18,7 +18,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Alonix needs your location to show nearby activities, track your runs, and find drivers.",
         "NSLocationAlwaysUsageDescription": "Alonix needs your location to track your workouts and safety status even when the app is in the background.",
-        "NSMotionUsageDescription": "Alonix uses your motion data to track your steps and activity levels."
+        "NSMotionUsageDescription": "Alonix uses your motion data to track your steps and activity levels.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -31,7 +32,9 @@
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
-        "ACTIVITY_RECOGNITION"
+        "ACTIVITY_RECOGNITION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "plugins": [
@@ -50,6 +53,11 @@
     ],
     "web": {
       "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "114b45af-125b-44eb-b544-fdf5f59d2e1d"
+      }
     }
   }
 }

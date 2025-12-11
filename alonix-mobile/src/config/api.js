@@ -10,8 +10,8 @@
 // Physical Device: http://YOUR_COMPUTER_IP:3000/api (find with ipconfig/ifconfig)
 
 export const API_BASE_URL = __DEV__
-  ? 'http://10.79.44.242:3000/api'  // Updated with current Wi-Fi IP
-  : 'https://your-production-url.com/api';  // Production
+  ? 'http://10.79.44.242:3000/api'  // Development - Local server
+  : 'https://alonix-backend.azurewebsites.net/api';  // Production - Azure
 
 // Google Places API Configuration
 // Get your API key from: https://console.cloud.google.com/apis/credentials
